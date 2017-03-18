@@ -9,7 +9,8 @@ const incId = arr => (arr[arr.length - 1].id + 1);
 let model = {
   inputText: "",
   todos: [
-    { id: 1,
+    {
+      id: 1,
       text: "some todo",
       completed: false,
       isEditing: false
@@ -20,9 +21,13 @@ let model = {
       model.inputText = text;
       render(model);
     },
-    submitForm: (val) => {
-      model.todos.push({id: incId(model.todos), text: model.inputText, complete: false, isEditing: false});
+    addTodo: (val) => {
+      model.todos.push({ id: incId(model.todos), text: model.inputText, complete: false, isEditing: false });
       model.inputText = "";
+      render(model);
+    },
+    removeTodo: (id) => {
+      model.todos = model.todos.filter(t => t.id !== id);
       render(model);
     }
   },
