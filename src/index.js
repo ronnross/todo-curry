@@ -4,6 +4,8 @@ import 'todomvc-common/base.css';
 import 'todomvc-app-css/index.css';
 
 const render = App.render(document.getElementById('root'));
+const incId = arr => (arr[arr.length - 1].id + 1);
+
 let model = {
   inputText: "",
   todos: [
@@ -19,7 +21,7 @@ let model = {
       render(model);
     },
     submitForm: (val) => {
-      model.todos.push({id: 2, text: model.inputText, complete: false, isEditing: false});
+      model.todos.push({id: incId(model.todos), text: model.inputText, complete: false, isEditing: false});
       model.inputText = "";
       render(model);
     }
