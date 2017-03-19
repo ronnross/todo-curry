@@ -4,17 +4,17 @@ import 'todomvc-common/base.css';
 import 'todomvc-app-css/index.css';
 
 const render = App.render(document.getElementById('root'));
-const incId = arr => (arr[arr.length - 1].id + 1);
+const incId = arr => arr.length === 0 ? 1 : (arr[arr.length - 1].id + 1);
 
 let model = {
   inputText: "",
   todos: [
-    {
-      id: 1,
-      text: "some todo",
-      completed: false,
-      isEditing: false
-    }
+    // {
+    //   id: 1,
+    //   text: "some todo",
+    //   completed: false,
+    //   isEditing: false
+    // }
   ],
   update: {
     updateText: (text) => {
@@ -28,6 +28,15 @@ let model = {
     },
     removeTodo: (id) => {
       model.todos = model.todos.filter(t => t.id !== id);
+      render(model);
+    },
+    toggleTodo: (id) => {
+      model.todos.forEach(t => {
+        if (t.id === id ) {
+          t.complete = !t.complete
+        }
+      });
+      console.log('toggle ', model.todos);
       render(model);
     }
   },

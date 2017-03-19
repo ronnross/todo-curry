@@ -21,26 +21,29 @@ const AddTodo = ({ model }) => {
   </header>
 };
 
-const Todo = ({ update, completed, text, id, isEditing }) => {
-  // console.log('update ', update);
+const Todo = ({ update, todo }) => {
   return (
-    <li className={completed ? "completed" : isEditing ? "editing" : ""}>
+    <li className={todo.complete ? "completed" : todo.isEditing ? "editing" : ""}>
       <div className="view">
-        <input className="toggle" type="checkbox" checked={completed} />
-        <label>{text}</label>
-        <button className="destroy" onClick={() => update.removeTodo(id)}></button>
+        <input className="toggle"
+               name="toggle"
+               onClick={() => update.toggleTodo(todo.id)}
+               type="checkbox"
+               checked={todo.complete} />
+        <label>{todo.text} - {todo.complete ? "true" : "false"}</label>
+        <button className="destroy" onClick={() => update.removeTodo(todo.id)}></button>
       </div>
     </li>
   )
 }
 
 const TodoList = ({ todos, update }) => {
-  // console.log('todolist ', update);
+  // console.log('todolist ', todos);
 
   return (
     <ul className="todo-list">
       {todos.map(todo => {
-        return (<Todo key={todo.id} update={update} {...todo} />)
+        return (<Todo key={todo.id} update={update} todo={todo} />)
       })}
     </ul>
   )
