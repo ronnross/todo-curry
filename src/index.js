@@ -32,15 +32,20 @@ let model = {
     },
     toggleTodo: (id) => {
       model.todos.forEach(t => {
-        if (t.id === id ) {
-          t.complete = !t.complete
-        }
+        if (t.id === id ) t.complete = !t.complete
       });
-      console.log('toggle ', model.todos);
+      render(model);
+    },
+    clearCompleted: () => {
+      model.todos = model.todos.filter(t => t.complete === false);
+      render(model);
+    },
+    filter: (filterName) => {
+      model.filter = filterName;
       render(model);
     }
   },
-  filter: "none"
+  filter: "all"
 };
 
 render(model);

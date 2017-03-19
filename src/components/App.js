@@ -30,7 +30,7 @@ const Todo = ({ update, todo }) => {
                onClick={() => update.toggleTodo(todo.id)}
                type="checkbox"
                checked={todo.complete} />
-        <label>{todo.text} - {todo.complete ? "true" : "false"}</label>
+        <label>{todo.text}</label>
         <button className="destroy" onClick={() => update.removeTodo(todo.id)}></button>
       </div>
     </li>
@@ -62,6 +62,14 @@ const VisibleTodoList = ({ model }) => {
   )
 };
 
+const Link = ({ filter, children, model }) => (
+  <a className={filter === model.filter ? 'selected' : ''}
+    onClick={e => { e.preventDefault(); model.update.filter(filter) }}
+    href="#" >
+    { children }
+  </a>
+)
+
 const Footer = ({ model }) => {
   const length = model.todos.length;
 
@@ -73,16 +81,16 @@ const Footer = ({ model }) => {
       </span>
       <ul className="filters">
         <li>
-          <a href="#">All</a>
+          <Link filter="all" model={model}>All</Link>
         </li>
         <li>
-          <a href="#">Active</a>
+          <Link filter="active" model={model}>Active</Link>
         </li>
         <li>
-          <a href="#">Completed</a>
+          <Link filter="complete" model={model}>Completed</Link>
         </li>
       </ul>
-      <button className="clear-completed">Clear completed</button>
+      <button onClick={() => model.update.clearCompleted()} className="clear-completed">Clear completed</button>
     </footer>
   )
 };
