@@ -50,14 +50,20 @@ const TodoList = ({ todos, update }) => {
 }
 
 const VisibleTodoList = ({ model }) => {
-  // console.log('todos ', model)
+  let filteredTodos = model.todos;
+  if (model.filter === 'active') {
+    filteredTodos = filteredTodos.filter(t => t.complete === false);
+  } else if (model.filter === 'complete') {
+    filteredTodos = filteredTodos.filter(t => t.complete === true);
+  }
+
   return (
     <section className="main">
       <input className="toggle-all"
         type="checkbox"
         onChange={() => "toggleAll(visibleTodos)"}
         checked={"isAllChecked"} />
-      <TodoList todos={model.todos} update={model.update} />
+      <TodoList todos={filteredTodos} update={model.update} />
     </section>
   )
 };
