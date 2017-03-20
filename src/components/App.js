@@ -30,9 +30,25 @@ const Todo = ({ update, todo }) => {
                onClick={() => update.toggleTodo(todo.id)}
                type="checkbox"
                checked={todo.complete} />
-        <label>{todo.text}</label>
+        <label onDoubleClick={() => update.editTodo(todo.id)}>{todo.text}</label>
         <button className="destroy" onClick={() => update.removeTodo(todo.id)}></button>
       </div>
+      {todo.isEditing
+        &&
+        <input
+          onBlur={() => update.toggleTodo(todo.id)}
+          onSubmit={() => update.toggleTodo(todo.id)}
+          onKeyDown={(e) => {
+            if (e.which === 13) {
+              //saveTodo({ id, text: e.target.value.trim() })
+              update.updateTodo(todo.id, e.target.value.trim());
+            }
+          }}
+          className="edit"
+          defaultValue={todo.text}
+          autoFocus
+          type="text" />
+      }
     </li>
   )
 }
@@ -82,8 +98,7 @@ const Footer = ({ model }) => {
   return (
     <footer className="footer">
       <span className="todo-count">
-        { length }
-        { length <= 1 ? " item left" : " items left" }
+        { length } { length <= 1 ? " item left" : " items left" }
       </span>
       <ul className="filters">
         <li>

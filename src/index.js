@@ -26,8 +26,25 @@ let model = {
       model.inputText = "";
       render(model);
     },
+    updateTodo: (id, text) => {
+      console.log('in update', id, text);
+      model.todos.forEach(t => {
+        if (t.id === id) {
+          t.isEditing = !t.isEditing;
+          t.text = text;
+        }
+      });
+      render(model);
+    },
     removeTodo: (id) => {
       model.todos = model.todos.filter(t => t.id !== id);
+      render(model);
+    },
+    editTodo: (id) => {
+      console.log('need to edit ', id);
+      model.todos.forEach(t => {
+        if (t.id === id) t.isEditing = !t.isEditing;
+      });
       render(model);
     },
     toggleTodo: (id) => {
