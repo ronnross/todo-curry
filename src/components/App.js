@@ -1,11 +1,12 @@
 import React from 'react';
 import { curry } from 'ramda';
 import ReactDOM from 'react-dom';
+import { todosLeft } from '../utils';
 
 const AddTodo = ({ model }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
-    model.update.addTodo()
+    model.update.addTodo();
   }
   let input;
   return <header className="header">
@@ -26,10 +27,10 @@ const Todo = ({ update, todo }) => {
     <li className={todo.complete ? "completed" : todo.isEditing ? "editing" : ""}>
       <div className="view">
         <input className="toggle"
-               name="toggle"
-               onClick={() => update.toggleTodo(todo.id)}
-               type="checkbox"
-               checked={todo.complete} />
+          name="toggle"
+          onClick={() => update.toggleTodo(todo.id)}
+          type="checkbox"
+          checked={todo.complete} />
         <label onDoubleClick={() => update.editTodo(todo.id)}>{todo.text}</label>
         <button className="destroy" onClick={() => update.removeTodo(todo.id)}></button>
       </div>
@@ -40,7 +41,6 @@ const Todo = ({ update, todo }) => {
           onSubmit={() => update.toggleTodo(todo.id)}
           onKeyDown={(e) => {
             if (e.which === 13) {
-              //saveTodo({ id, text: e.target.value.trim() })
               update.updateTodo(todo.id, e.target.value.trim());
             }
           }}
@@ -53,17 +53,13 @@ const Todo = ({ update, todo }) => {
   )
 }
 
-const TodoList = ({ todos, update }) => {
-  // console.log('todolist ', todos);
-
-  return (
-    <ul className="todo-list">
-      {todos.map(todo => {
-        return (<Todo key={todo.id} update={update} todo={todo} />)
-      })}
-    </ul>
-  )
-}
+const TodoList = ({ todos, update }) => (
+  <ul className="todo-list">
+    {todos.map(todo => {
+      return (<Todo key={todo.id} update={update} todo={todo} />)
+    })}
+  </ul>
+);
 
 const VisibleTodoList = ({ model }) => {
   let filteredTodos = model.todos;
@@ -77,7 +73,7 @@ const VisibleTodoList = ({ model }) => {
     <section className="main">
       <input className="toggle-all"
         type="checkbox"
-        onChange={() => "toggleAll(visibleTodos)"}
+        onChange={() => model.update.toggleAll()}
         checked={"isAllChecked"} />
       <TodoList todos={filteredTodos} update={model.update} />
     </section>
@@ -88,33 +84,29 @@ const Link = ({ filter, children, model }) => (
   <a className={filter === model.filter ? 'selected' : ''}
     onClick={e => { e.preventDefault(); model.update.filter(filter) }}
     href="#" >
-    { children }
+    {children}
   </a>
 )
 
-const Footer = ({ model }) => {
-  const length = model.todos.length;
-
-  return (
-    <footer className="footer">
-      <span className="todo-count">
-        { length } { length <= 1 ? " item left" : " items left" }
-      </span>
-      <ul className="filters">
-        <li>
-          <Link filter="all" model={model}>All</Link>
-        </li>
-        <li>
-          <Link filter="active" model={model}>Active</Link>
-        </li>
-        <li>
-          <Link filter="complete" model={model}>Completed</Link>
-        </li>
-      </ul>
-      <button onClick={() => model.update.clearCompleted()} className="clear-completed">Clear completed</button>
-    </footer>
-  )
-};
+const Footer = ({ model }) => (
+  <footer className="footer">
+    <span className="todo-count">
+      {todosLeft(model.todos)}
+    </span>
+    <ul className="filters">
+      <li>
+        <Link filter="all" model={model}>All</Link>
+      </li>
+      <li>
+        <Link filter="active" model={model}>Active</Link>
+      </li>
+      <li>
+        <Link filter="complete" model={model}>Completed</Link>
+      </li>
+    </ul>
+    <button onClick={() => model.update.clearCompleted()} className="clear-completed">Clear completed</button>
+  </footer>
+);
 
 const App = (model) => (
   <div>

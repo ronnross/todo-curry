@@ -2,9 +2,8 @@
 import App from './components/App';
 import 'todomvc-common/base.css';
 import 'todomvc-app-css/index.css';
-
+import { incId } from './utils';
 const render = App.render(document.getElementById('root'));
-const incId = arr => arr.length === 0 ? 1 : (arr[arr.length - 1].id + 1);
 
 let model = {
   inputText: "",
@@ -12,7 +11,7 @@ let model = {
     // {
     //   id: 1,
     //   text: "some todo",
-    //   completed: false,
+    //   complete: false,
     //   isEditing: false
     // }
   ],
@@ -60,9 +59,16 @@ let model = {
     filter: (filterName) => {
       model.filter = filterName;
       render(model);
+    },
+    toggleAll: () => {
+      model.todos.forEach(t => {
+        t.complete = !t.complete;
+      });
+      render(model);
     }
   },
   filter: "all"
 };
 
+// call the xhr request
 render(model);
