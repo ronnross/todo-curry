@@ -5,6 +5,16 @@ export const todosLeft = (todos) => {
 
 export const incId = arr => arr.length === 0 ? 1 : (arr[arr.length - 1].id + 1);
 
+export const filteredTodos = (filter, todos) => {
+  let filteredTodos = todos;
+  if (filter === 'active') {
+    filteredTodos = filteredTodos.filter(t => t.complete === false);
+  } else if (filter === 'complete') {
+    filteredTodos = filteredTodos.filter(t => t.complete === true);
+  }
+
+  return filteredTodos;
+}
 export const xhr = {
   get: (url, cb) => {
     setTimeout(() => {

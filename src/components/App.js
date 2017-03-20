@@ -1,29 +1,22 @@
 import React from 'react';
 import { curry } from 'ramda';
 import ReactDOM from 'react-dom';
-import { todosLeft } from '../utils';
+import { todosLeft, filteredTodos } from '../utils';
 
-const AddTodo = ({ model }) => {
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    model.update.addTodo();
-  }
-  let input;
-  return <header className="header">
+const AddTodo = ({ state, update }) => (
+  <header className="header">
     <h1>todos</h1>
-    <form onSubmit={handleSubmit} >
+    <form onSubmit={(e) => {e.preventDefault(); update.addTodo()}} >
       <input className="new-todo"
-        ref={node => { input = node }}
-        onChange={e => model.update.updateText(input.value)}
-        value={model.inputText}
+        onChange={e => update.updateText(e.target.value)}
+        value={state.inputText}
         placeholder="What needs to be done?"
         autoFocus />
     </form>
   </header>
-};
+);
 
-const Todo = ({ update, todo }) => {
-  return (
+const Todo = ({ update, todo }) => (
     <li className={todo.complete ? "completed" : todo.isEditing ? "editing" : ""}>
       <div className="view">
         <input className="toggle"
@@ -34,24 +27,18 @@ const Todo = ({ update, todo }) => {
         <label onDoubleClick={() => update.editTodo(todo.id)}>{todo.text}</label>
         <button className="destroy" onClick={() => update.removeTodo(todo.id)}></button>
       </div>
-      {todo.isEditing
-        &&
-        <input
-          onBlur={() => update.toggleTodo(todo.id)}
-          onSubmit={() => update.toggleTodo(todo.id)}
-          onKeyDown={(e) => {
-            if (e.which === 13) {
-              update.updateTodo(todo.id, e.target.value.trim());
-            }
-          }}
-          className="edit"
-          defaultValue={todo.text}
-          autoFocus
-          type="text" />
+      {todo.isEditing && <input onBlur={() => update.toggleTodo(todo.id)}
+                                onSubmit={() => update.toggleTodo(todo.id)}
+                                onKeyDown={(e) => {
+                                  if (e.which === 13) update.updateTodo(todo.id, e.target.value.trim());
+                                }}
+                                className="edit"
+                                defaultValue={todo.text}
+                                autoFocus
+                                type="text" />
       }
     </li>
-  )
-}
+);
 
 const TodoList = ({ todos, update }) => (
   <ul className="todo-list">
@@ -61,37 +48,28 @@ const TodoList = ({ todos, update }) => (
   </ul>
 );
 
-const VisibleTodoList = ({ model }) => {
-  let filteredTodos = model.todos;
-  if (model.filter === 'active') {
-    filteredTodos = filteredTodos.filter(t => t.complete === false);
-  } else if (model.filter === 'complete') {
-    filteredTodos = filteredTodos.filter(t => t.complete === true);
-  }
-
-  return (
+const VisibleTodoList = ({ model }) => (
     <section className="main">
       <input className="toggle-all"
         type="checkbox"
         onChange={() => model.update.toggleAll()}
         checked={"isAllChecked"} />
-      <TodoList todos={filteredTodos} update={model.update} />
+      <TodoList todos={filteredTodos(model.state.filter, model.state.todos)} update={model.update} />
     </section>
-  )
-};
+);
 
 const Link = ({ filter, children, model }) => (
-  <a className={filter === model.filter ? 'selected' : ''}
+  <a className={filter === model.state.filter ? 'selected' : ''}
     onClick={e => { e.preventDefault(); model.update.filter(filter) }}
     href="#" >
     {children}
   </a>
-)
+);
 
 const Footer = ({ model }) => (
   <footer className="footer">
     <span className="todo-count">
-      {todosLeft(model.todos)}
+      {todosLeft(model.state.todos)}
     </span>
     <ul className="filters">
       <li>
@@ -111,7 +89,7 @@ const Footer = ({ model }) => (
 const App = (model) => (
   <div>
     <section className="todoapp">
-      <AddTodo model={model} />
+      <AddTodo state={model.state} update={model.update} />
       <VisibleTodoList model={model} />
       <Footer model={model} />
     </section>

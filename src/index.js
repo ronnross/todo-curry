@@ -5,23 +5,25 @@ import { incId, xhr } from './utils';
 const render = App.render(document.getElementById('root'));
 
 let model = {
-  inputText: "",
-  filter: "all",
-  todos: [],
+  state: {
+    inputText: "",
+    filter: "all",
+    todos: []
+  },
   update: {
     updateText: (text) => {
-      model.inputText = text;
+      model.state.inputText = text;
       render(model);
     },
     addTodo: (val) => {
-      const todoText = val ? val : model.inputText;
-      model.todos.push({ id: incId(model.todos), text: todoText, complete: false, isEditing: false });
-      model.inputText = "";
+      const todoText = val ? val : model.state.inputText;
+      model.state.todos.push({ id: incId(model.state.todos), text: todoText, complete: false, isEditing: false });
+      model.state.inputText = "";
       render(model);
     },
     updateTodo: (id, text) => {
       console.log('in update', id, text);
-      model.todos.forEach(t => {
+      model.state.todos.forEach(t => {
         if (t.id === id) {
           t.isEditing = !t.isEditing;
           t.text = text;
@@ -30,32 +32,32 @@ let model = {
       render(model);
     },
     removeTodo: (id) => {
-      model.todos = model.todos.filter(t => t.id !== id);
+      model.state.todos = model.state.todos.filter(t => t.id !== id);
       render(model);
     },
     editTodo: (id) => {
       console.log('need to edit ', id);
-      model.todos.forEach(t => {
+      model.state.todos.forEach(t => {
         if (t.id === id) t.isEditing = !t.isEditing;
       });
       render(model);
     },
     toggleTodo: (id) => {
-      model.todos.forEach(t => {
+      model.state.todos.forEach(t => {
         if (t.id === id ) t.complete = !t.complete
       });
       render(model);
     },
     clearCompleted: () => {
-      model.todos = model.todos.filter(t => t.complete === false);
+      model.state.todos = model.todos.filter(t => t.complete === false);
       render(model);
     },
     filter: (filterName) => {
-      model.filter = filterName;
+      model.state.filter = filterName;
       render(model);
     },
     toggleAll: () => {
-      model.todos.forEach(t => {
+      model.state.todos.forEach(t => {
         t.complete = !t.complete;
       });
       render(model);
@@ -72,5 +74,5 @@ let model = {
   }
 };
 
-model.effects.getRemoteTodos();
+// model.effects.getRemoteTodos();
 render(model);
