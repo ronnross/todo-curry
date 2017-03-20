@@ -1,27 +1,21 @@
-// import React from 'react';
 import App from './components/App';
 import 'todomvc-common/base.css';
 import 'todomvc-app-css/index.css';
-import { incId } from './utils';
+import { incId, xhr } from './utils';
 const render = App.render(document.getElementById('root'));
 
 let model = {
   inputText: "",
-  todos: [
-    // {
-    //   id: 1,
-    //   text: "some todo",
-    //   complete: false,
-    //   isEditing: false
-    // }
-  ],
+  filter: "all",
+  todos: [],
   update: {
     updateText: (text) => {
       model.inputText = text;
       render(model);
     },
     addTodo: (val) => {
-      model.todos.push({ id: incId(model.todos), text: model.inputText, complete: false, isEditing: false });
+      const todoText = val ? val : model.inputText;
+      model.todos.push({ id: incId(model.todos), text: todoText, complete: false, isEditing: false });
       model.inputText = "";
       render(model);
     },
@@ -67,8 +61,16 @@ let model = {
       render(model);
     }
   },
-  filter: "all"
+  effects: {
+    getRemoteTodos: () => {
+      xhr.get('/todos', (data) => {
+        data.forEach(t => {
+          model.update.addTodo(t)
+        });
+      });
+    }
+  }
 };
 
-// call the xhr request
+model.effects.getRemoteTodos();
 render(model);
