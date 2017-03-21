@@ -4,6 +4,11 @@ import 'todomvc-app-css/index.css';
 import { incId, xhr } from './utils';
 const render = App.render(document.getElementById('root'));
 
+const dispatch = (fn, ...payload) => {
+  const result = fn(...payload);
+  render(result);
+}
+
 let model = {
   state: {
     inputText: "",
@@ -13,54 +18,52 @@ let model = {
   update: {
     updateText: (text) => {
       model.state.inputText = text;
-      render(model);
+      return model;
     },
     addTodo: (val) => {
       const todoText = val ? val : model.state.inputText;
       model.state.todos.push({ id: incId(model.state.todos), text: todoText, complete: false, isEditing: false });
       model.state.inputText = "";
-      render(model);
+      return model;
     },
     updateTodo: (id, text) => {
-      console.log('in update', id, text);
       model.state.todos.forEach(t => {
         if (t.id === id) {
           t.isEditing = !t.isEditing;
           t.text = text;
         }
       });
-      render(model);
+      return model;
     },
     removeTodo: (id) => {
       model.state.todos = model.state.todos.filter(t => t.id !== id);
-      render(model);
+      return model;
     },
     editTodo: (id) => {
-      console.log('need to edit ', id);
       model.state.todos.forEach(t => {
         if (t.id === id) t.isEditing = !t.isEditing;
       });
-      render(model);
+      return model;
     },
     toggleTodo: (id) => {
       model.state.todos.forEach(t => {
         if (t.id === id ) t.complete = !t.complete
       });
-      render(model);
+      return model;
     },
     clearCompleted: () => {
-      model.state.todos = model.todos.filter(t => t.complete === false);
-      render(model);
+      model.state.todos = model.state.todos.filter(t => t.complete === false);
+      return model;
     },
     filter: (filterName) => {
       model.state.filter = filterName;
-      render(model);
+      return model;
     },
     toggleAll: () => {
       model.state.todos.forEach(t => {
         t.complete = !t.complete;
       });
-      render(model);
+      return model;
     }
   },
   effects: {
@@ -71,8 +74,9 @@ let model = {
         });
       });
     }
-  }
+  },
+  dispatch: dispatch
 };
 
-// model.effects.getRemoteTodos();
+model.effects.getRemoteTodos();
 render(model);
