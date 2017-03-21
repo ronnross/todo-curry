@@ -5,6 +5,8 @@ export const todosLeft = (todos) => {
 
 export const incId = arr => arr.length === 0 ? 1 : (arr[arr.length - 1].id + 1);
 
+export const curry = (fn, ...params) => fn.length <= params.length ? fn(...params) : (...others) => curry(fn, ...params, ...others);
+
 export const filteredTodos = (filter, todos) => {
   let filteredTodos = todos;
   if (filter === 'active') {

@@ -1,7 +1,7 @@
 import React from 'react';
-import { curry } from 'ramda';
+// import { curry } from 'ramda';
 import ReactDOM from 'react-dom';
-import { todosLeft, filteredTodos } from '../utils';
+import { todosLeft, filteredTodos, curry } from '../utils';
 
 const AddTodo = ({ dispatch, state, update }) => (
   <header className="header">
