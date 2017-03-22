@@ -30,6 +30,10 @@ export const xhr = {
   }
 };
 
-export function objMap(obj, fn) {
+export function objMap(fn, obj) {
   return Object.keys(obj).reduce((acc, key) => {acc[key] = fn(obj[key]); return acc}, {})
+}
+
+export function forEachObj(fn, obj) {
+  Object.keys(obj).forEach((key) => fn(obj[key]))
 }

@@ -1,7 +1,7 @@
 import App from './components/App';
 import 'todomvc-common/base.css';
 import 'todomvc-app-css/index.css';
-import { incId, xhr, objMap } from './utils';
+import { incId, xhr, objMap, forEachObj } from './utils';
 
 const render = App.render(document.getElementById('root'));
 
@@ -70,23 +70,30 @@ const todo = {
         });
       });
     }
+  },
+  subscriptions: {
+    excitingStuff: actions => {
+      setTimeout(() => actions.getRemoteTodos(), 3000)
+    }
   }
 };
 
-const start = ({state, reducers, effects}) => {
+const start = ({state, reducers, effects, subscriptions}) => {
   const internalState = {}
-  const internalActions = Object.assign(objMap(effects, (effect) => (...payload) => effect({state: internalState, actions: internalActions}, ...payload))
-                                      , objMap(reducers, (reducer) => (...payload) => reducerDispatch(reducer, ...payload)))
+  const internalActions = Object.assign(objMap((effect) => (...payload) => effect({state: internalState, actions: internalActions}, ...payload), effects)
+                                      , objMap((reducer) => (...payload) => reducerDispatch(reducer, ...payload), reducers))
 
   function reducerDispatch (fn, ...payload) {
     Object.assign(internalState, fn(state, ...payload))
-    render({model: {state: internalState, actions: internalActions}});
+    render({model: {state: internalState, actions: internalActions}})
   }
 
   reducerDispatch((state) => state, state)
+  forEachObj((subscription) => subscription(internalActions), subscriptions)
 
   return internalActions
 }
 
-const todoActions = start(todo);
-todoActions.getRemoteTodos();
+// const todoActions =
+start(todo);
+// todoActions.getRemoteTodos();
