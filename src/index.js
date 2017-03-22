@@ -1,33 +1,29 @@
 import App from './components/App';
 import 'todomvc-common/base.css';
 import 'todomvc-app-css/index.css';
-import { incId, xhr } from './utils';
+import { incId, xhr, objMap } from './utils';
+
 const render = App.render(document.getElementById('root'));
 
-const dispatch = (fn, ...payload) => {
-  const result = fn(...payload);
-  render(result);
-}
-
-let model = {
+const todo = {
   state: {
     inputText: "",
     filter: "all",
     todos: []
   },
-  update: {
-    updateText: (text) => {
-      model.state.inputText = text;
+  reducers: {
+    updateText: (model, text) => {
+      model.inputText = text;
       return model;
     },
-    addTodo: (val) => {
-      const todoText = val ? val : model.state.inputText;
-      model.state.todos.push({ id: incId(model.state.todos), text: todoText, complete: false, isEditing: false });
-      model.state.inputText = "";
+    addTodo: (model, val) => {
+      const todoText = val ? val : model.inputText;
+      model.todos.push({ id: incId(model.todos), text: todoText, complete: false, isEditing: false });
+      model.inputText = "";
       return model;
     },
-    updateTodo: (id, text) => {
-      model.state.todos.forEach(t => {
+    updateTodo: (model, id, text) => {
+      model.todos.forEach(t => {
         if (t.id === id) {
           t.isEditing = !t.isEditing;
           t.text = text;
@@ -35,48 +31,62 @@ let model = {
       });
       return model;
     },
-    removeTodo: (id) => {
-      model.state.todos = model.state.todos.filter(t => t.id !== id);
+    removeTodo: (model, id) => {
+      model.todos = model.todos.filter(t => t.id !== id);
       return model;
     },
-    editTodo: (id) => {
-      model.state.todos.forEach(t => {
+    editTodo: (model, id) => {
+      model.todos.forEach(t => {
         if (t.id === id) t.isEditing = !t.isEditing;
       });
       return model;
     },
-    toggleTodo: (id) => {
-      model.state.todos.forEach(t => {
+    toggleTodo: (model, id) => {
+      model.todos.forEach(t => {
         if (t.id === id ) t.complete = !t.complete
       });
       return model;
     },
-    clearCompleted: () => {
-      model.state.todos = model.state.todos.filter(t => t.complete === false);
+    clearCompleted: (model) => {
+      model.todos = model.todos.filter(t => t.complete === false);
       return model;
     },
-    filter: (filterName) => {
-      model.state.filter = filterName;
+    filter: (model, filterName) => {
+      model.filter = filterName;
       return model;
     },
-    toggleAll: () => {
-      model.state.todos.forEach(t => {
+    toggleAll: (model) => {
+      model.todos.forEach(t => {
         t.complete = !t.complete;
       });
       return model;
     }
   },
   effects: {
-    getRemoteTodos: () => {
+    getRemoteTodos: ({state, actions}) => {
       xhr.get('/todos', (data) => {
         data.forEach(t => {
-          model.update.addTodo(t)
+          actions.addTodo(t)
         });
       });
     }
-  },
-  dispatch: dispatch
+  }
 };
 
-model.effects.getRemoteTodos();
-render(model);
+const start = ({state, reducers, effects}) => {
+  const internalState = {}
+  const internalActions = Object.assign(objMap(effects, (effect) => (...payload) => effect({state: internalState, actions: internalActions}, ...payload))
+                                      , objMap(reducers, (reducer) => (...payload) => reducerDispatch(reducer, ...payload)))
+
+  function reducerDispatch (fn, ...payload) {
+    Object.assign(internalState, fn(state, ...payload))
+    render({model: {state: internalState, actions: internalActions}});
+  }
+
+  reducerDispatch((state) => state, state)
+
+  return internalActions
+}
+
+const todoActions = start(todo);
+todoActions.getRemoteTodos();

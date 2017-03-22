@@ -17,6 +17,7 @@ export const filteredTodos = (filter, todos) => {
 
   return filteredTodos;
 }
+
 export const xhr = {
   get: (url, cb) => {
     setTimeout(() => {
@@ -28,3 +29,7 @@ export const xhr = {
     }, 1000);
   }
 };
+
+export function objMap(obj, fn) {
+  return Object.keys(obj).reduce((acc, key) => {acc[key] = fn(obj[key]); return acc}, {})
+}

@@ -1,36 +1,35 @@
 import React from 'react';
-// import { curry } from 'ramda';
 import ReactDOM from 'react-dom';
 import { todosLeft, filteredTodos, curry } from '../utils';
 
-const AddTodo = ({ dispatch, state, update }) => (
+const AddTodo = ({model}) => (
   <header className="header">
     <h1>todos</h1>
-    <form onSubmit={e => { e.preventDefault(); dispatch(update.addTodo) }} >
+    <form onSubmit={e => { e.preventDefault(); model.actions.addTodo() }} >
       <input className="new-todo"
-        onChange={e => dispatch(update.updateText, e.target.value)}
-        value={state.inputText}
+        onChange={e => model.actions.updateText(e.target.value)}
+        value={model.state.inputText}
         placeholder="What needs to be done?"
         autoFocus />
     </form>
   </header>
 );
 
-const Todo = ({ model, update, todo }) => (
+const Todo = ({todo, model}) => (
   <li className={todo.complete ? "completed" : todo.isEditing ? "editing" : ""}>
     <div className="view">
       <input className="toggle"
         name="toggle"
-        onClick={() => model.dispatch(update.toggleTodo, todo.id)}
+        onClick={() => model.actions.toggleTodo(todo.id)}
         type="checkbox"
         checked={todo.complete} />
-      <label onDoubleClick={() => model.dispatch(update.editTodo, todo.id)}>{todo.text}</label>
-      <button className="destroy" onClick={() => model.dispatch(update.removeTodo, todo.id)}></button>
+      <label onDoubleClick={() => model.actions.editTodo(todo.id)}>{todo.text}</label>
+      <button className="destroy" onClick={() => model.actions.removeTodo(todo.id)}></button>
     </div>
-    {todo.isEditing && <input onBlur={() => model.dispatch(update.toggleTodo, todo.id)}
-      onSubmit={() => model.dispatch(update.toggleTodo, todo.id)}
+    {todo.isEditing && <input onBlur={() => model.actions.updateTodo(todo.id, todo.text)}
+      onSubmit={() => model.actions.toggleTodo(todo.id)}
       onKeyDown={(e) => {
-        if (e.which === 13) model.dispatch(update.updateTodo, todo.id, e.target.value.trim());
+        if (e.which === 13) model.actions.updateTodo(todo.id, e.target.value.trim());
       }}
       className="edit"
       defaultValue={todo.text}
@@ -40,56 +39,56 @@ const Todo = ({ model, update, todo }) => (
   </li>
 );
 
-const TodoList = ({ model, todos, update }) => (
+const TodoList = ({todos, model}) => (
   <ul className="todo-list">
     {todos.map(todo => {
-      return (<Todo model={model} key={todo.id} update={update} todo={todo} />)
+      return (<Todo key={todo.id} todo={todo} model={model} />)
     })}
   </ul>
 );
 
-const VisibleTodoList = ({ model }) => (
+const VisibleTodoList = ({model}) => (
   <section className="main">
     <input className="toggle-all"
       type="checkbox"
-      onChange={() => model.dispatch(model.update.toggleAll)}
+      onChange={() => model.actions.toggleAll()}
       checked={"isAllChecked"} />
-    <TodoList model={model} todos={filteredTodos(model.state.filter, model.state.todos)} update={model.update} />
+    <TodoList todos={filteredTodos(model.state.filter, model.state.todos)} model={model} />
   </section>
 );
 
-const Link = ({ filter, children, model }) => (
+const Link = ({children, filter, model}) => (
   <a className={filter === model.state.filter ? 'selected' : ''}
-    onClick={e => { e.preventDefault(); model.dispatch(model.update.filter, filter) }}
+    onClick={e => { e.preventDefault(); model.actions.filter(filter) }}
     href="#" >
     {children}
   </a>
 );
 
-const Footer = ({ model }) => (
+const Footer = ({model}) => (
   <footer className="footer">
     <span className="todo-count">
       {todosLeft(model.state.todos)}
     </span>
     <ul className="filters">
       <li>
-        <Link filter="all" model={model}>All</Link>
+        <Link filter="all" model={model} >All</Link>
       </li>
       <li>
-        <Link filter="active" model={model}>Active</Link>
+        <Link filter="active" model={model} >Active</Link>
       </li>
       <li>
-        <Link filter="complete" model={model}>Completed</Link>
+        <Link filter="complete" model={model} >Completed</Link>
       </li>
     </ul>
-    <button onClick={() => model.dispatch(model.update.clearCompleted)} className="clear-completed">Clear completed</button>
+    <button onClick={() => model.actions.clearCompleted()} className="clear-completed">Clear completed</button>
   </footer>
 );
 
-const App = (model) => (
+const App = ({model}) => (
   <div>
     <section className="todoapp">
-      <AddTodo dispatch={model.dispatch} state={model.state} update={model.update} />
+      <AddTodo model={model} />
       <VisibleTodoList model={model} />
       <Footer model={model} />
     </section>
